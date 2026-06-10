@@ -1,121 +1,174 @@
-1. 项目概述
-本项目是一个基于 Java 开发的“原神”游戏综合攻略与数据管理系统。系统旨在为玩家提供详尽的角色图鉴、武器装备数据、秘境掉落信息以及养成资源计算等功能。底层架构采用成熟的若依（RuoYi）后台管理系统（多模块版），具备高效率的开发体验、完善的权限控制和良好的可扩展性。
+# 原神攻略系统 (Genshin Impact Strategy System)
 
-2. 快速开始
-环境要求
-JDK: 1.8+
+基于 [RuoYi](https://gitee.com/y_project/RuoYi) 框架构建的原神游戏数据管理与攻略平台，为《原神》玩家与内容运营人员提供一套完整的攻略管理解决方案。
 
-数据库: MySQL 5.7+
+## 📋 项目简介
 
-缓存: Redis
+本项目在 RuoYi 企业级开发框架基础上扩展，围绕角色、武器、圣遗物、敌人等核心数据，提供角色管理、武器推荐、圣遗物搭配、敌人信息管理等功能模块，并通过 Apache Shiro 权限控制与数据持久化保障系统的安全性与可维护性。
 
-构建工具: Maven
+### 适用场景
 
-启动步骤
-克隆或下载项目代码到本地。
+- 原神玩家攻略资料管理与分享
+- 游戏运营方的内容管理与数据维护
+- 教育/培训场景的角色与玩法知识库
 
-在 MySQL 中创建数据库，并依次导入 sql 目录下的脚本（如 genshin_all.sql 和 rytest.sql）。
+## 🚀 技术栈
 
-打开 ruoyi-admin/src/main/resources/application-druid.yml，修改数据库连接配置（账号、密码）。
+| 类别 | 技术 | 版本 |
+|------|------|------|
+| 核心框架 | Spring Boot | 4.0.3 (JDK 17+) |
+| 安全框架 | Apache Shiro (Jakarta) | 2.1.0 |
+| 持久层 | MyBatis + Druid 连接池 | 4.0.1 / 1.2.28 |
+| 前端模板 | Thymeleaf + Bootstrap + jQuery | - |
+| 分页插件 | PageHelper | 2.1.1 |
+| 工具库 | Fastjson, Apache POI | 1.2.83 / 4.1.2 |
+| API 文档 | SpringDoc OpenAPI | 3.0.2 |
 
-打开 ruoyi-admin/src/main/resources/application.yml，确认 Redis 配置正确。
+## 🏗️ 项目结构
 
-在项目根目录执行 mvn clean install 安装依赖。
+```
+├── ruoyi-admin          # Web 后端入口模块（控制器、前端模板、静态资源）
+├── ruoyi-common         # 通用工具与实体基类（BaseController、分页、响应封装）
+├── ruoyi-framework      # 框架支撑模块（Shiro 安全、MyBatis 配置、拦截器）
+├── ruoyi-system         # 业务模块（领域模型、Service、Mapper）
+├── ruoyi-generator      # 代码生成器（可选）
+├── ruoyi-quartz         # 定时任务模块（可选）
+├── sql                  # 数据库初始化脚本
+│   ├── genshin_all.sql  # 原神业务表结构与数据
+│   └── rytest.sql       # 测试数据
+└── docx                 # 项目文档（需求分析、详细设计等）
+```
 
-运行 ruoyi-admin 模块下的 RuoYiApplication.java 启动项目。
+### 模块依赖关系
 
-浏览器访问 http://localhost:80，使用默认管理员账号登录（admin / admin123）。
+```
+ruoyi-admin ──→ ruoyi-framework ──→ ruoyi-common
+     │
+     └──→ ruoyi-system ──→ ruoyi-common
+```
 
-3. 系统架构设计
-系统采用经典的分层架构设计（详细架构图见 docx/详细设计/draw图纸文件/系统分层架构图.png）：
+## ✨ 核心功能
 
-核心框架: Spring Boot
+### 角色管理系统
+- 角色基础信息增删改查与 Excel 导出
+- 培养路线构建页（集成推荐武器、圣遗物、配队、天赋材料）
 
-安全框架: Apache Shiro
+### 武器推荐系统
+- 武器信息管理（类型、星级、属性、突破材料）
+- 基于角色的武器适配推荐
 
-持久层框架: MyBatis
+### 圣遗物推荐系统
+- 按角色推荐圣遗物套装与主副词条配置
+- 支持沙漏/杯子/头冠主词条及副词条优先级
 
-前端视图: Thymeleaf + Bootstrap
+### 敌人信息管理
+- 怪物基础信息、类型、分类、描述维护
 
-数据库连接池: Druid
+### 用户收藏系统
+- 角色/推荐内容的收藏与查询管理
 
-日志管理: SLF4J + Logback
+### 计算器系统
+- 战斗/培养相关计算入口（可按需扩展）
 
-4. 核心功能模块
-系统在若依基础权限（用户、角色、菜单、部门、字典）之上，扩展了丰富的原神业务模块：
+### 权限与安全
+- 基于 Apache Shiro 的认证授权与会话管理
+- 细粒度权限控制（`@RequiresPermissions`）
+- 操作日志记录（`@Log` 注解自动记录）
+- 验证码、记住我、并发登录踢出
 
-角色图鉴管理 (system/character): 涵盖所有角色的基础属性、命之座、天赋等信息。
+## 🛠️ 快速开始
 
-武器与圣遗物库 (system/weapon, system/artifact): 提供装备的基础属性、特效说明及推荐搭配。
+### 环境要求
 
-资源与秘境 (system/domain, system/materials): 记录每日秘境掉落、大图怪物分布及养成材料汇总。
+- JDK 17+
+- Maven 3.6+
+- MySQL 5.7+
+- IDE（推荐 IntelliJ IDEA）
 
-智能推荐系统 (system/recommendTeam, system/recommendWeapon): 为玩家提供主流的配队方案与武器优选。
+### 安装与部署
 
-资源计算器 (system/calculator, system/costs): 精确计算角色升级、天赋拉满所需的材料清单与摩拉消耗。
+1. **克隆项目**
+   ```bash
+   git clone https://github.com/suibian1023/JAVAPractical_training--Genshin_Impact_Strategy_System.git
+   ```
 
-用户收藏 (system/favorite): 允许前端用户收藏常用的配队与角色攻略。
+2. **初始化数据库**
+   - 创建数据库（如 `genshin`）
+   - 执行 `sql/genshin_all.sql` 初始化表结构与基础数据
 
-5. 数据库设计
-数据库采用关系型设计，包含系统表与业务表两部分。完整的实体关系图可参考 docx/详细设计/db数据库设计/E-R图.png。
-核心业务表主要包括：
+3. **修改配置**
+   - 编辑 `ruoyi-admin/src/main/resources/application.yml` 中的数据库连接信息
+   - 编辑 `ruoyi-admin/src/main/resources/application-druid.yml` 调整连接池参数
 
-characters: 角色基础信息数据表（业务查询核心表）。
+4. **编译运行**
+   ```bash
+   mvn clean package
+   java -jar ruoyi-admin/target/ruoyi-admin.jar
+   ```
+   或在 IDE 中直接运行 `RuoYiApplication.java`
 
-genshin_weapon: 武器图鉴表。
+5. **访问后台**
+   - 地址：`http://localhost:8080`
+   - 默认管理员账号：`admin` / `admin123`
 
-genshin_artifact: 圣遗物套装数据表。
+### 首次启动配置
 
-materials: 养成材料字典表。
+1. 登录系统，修改初始管理员密码
+2. 配置系统参数（站点名称、首页路径等）
+3. 创建角色与菜单，分配权限
+4. 发布公告与测试用户管理
+5. 验证原神角色/武器/材料等业务功能
 
-talent_costs: 天赋升级消耗对照表。
+## 📐 系统架构
 
-6. API接口文档
-系统集成了 Swagger 来生成和管理 API 文档。
+系统采用经典的三层架构与 MVC 模式：
 
-在项目启动后，可以通过访问 http://localhost:80/swagger-ui.html 查看完整的 RESTful API 接口定义。
+```
+浏览器 ──→ Controller（路由/权限校验）──→ Service（业务逻辑）
+                                              │
+                                         Mapper（SQL 映射）
+                                              │
+                                          MySQL 数据库
+```
 
-在接口文档中，可以直接进行接口的联调与测试（包括字典查询、数据增删改查等）。
+- **表现层**（`ruoyi-admin`）：接收 HTTP 请求，调用 Service，返回视图或 JSON
+- **业务层**（`ruoyi-system`）：封装业务规则，协调多个 Mapper 完成复杂操作
+- **数据层**（`ruoyi-system` Mapper）：执行 SQL，映射结果到领域对象
+- **框架层**（`ruoyi-framework`）：MyBatis 配置、Shiro 安全、拦截器、异步管理
 
-7. 安全与权限
-认证与授权: 依托 Apache Shiro 进行细粒度的权限控制（RBAC 模型），支持到按钮级别的权限拦截。
+## 📝 编码规范
 
-数据权限: 支持数据范围控制（全部数据、本部门及以下数据、本部门数据、仅本人数据、自定义数据）。
+- 控制器继承 `BaseController`，复用分页（`startPage`）与响应封装（`getDataTable`/`toAjax`）
+- 业务方法使用 `@RequiresPermissions` 注解进行权限控制，格式 `模块:功能:操作`
+- 写操作标注 `@Log` 注解，自动记录操作日志
+- Service 层接口与实现分离，接口以 `I` 开头，实现以 `Impl` 结尾
 
-防范机制: 内置 XSS 过滤（XssFilter）、防重复提交拦截（RepeatSubmitInterceptor）以及 CSRF 校验机制。
+## ❓ 故障排查
 
-8. 开发指南
-代码生成: 系统内置代码生成器（ruoyi-generator），可通过后台配置表结构，一键生成 Controller、Service、Mapper 及 HTML 页面代码，大幅提升开发效率。
+| 问题 | 排查方向 |
+|------|----------|
+| 启动失败 | 检查 JDK 版本与 Maven 依赖是否完整 |
+| 数据库连接失败 | 核对 `application.yml` 中的数据库配置 |
+| 登录异常 | 确认管理员账号密码，检查 Shiro 配置 |
+| 权限不足 | 检查角色与菜单权限分配 |
+| 页面无数据 | 检查 Controller 服务注入与模板变量 |
+| SQL 执行错误 | 确认初始化脚本是否完整执行 |
 
-目录结构:
+## 📄 项目文档
 
-ruoyi-admin: Web服务入口与控制器。
+项目文档位于 `docx/` 目录：
+- `需求分析/` — 需求分析说明书、用例图、需求分析矩阵
+- `详细设计/` — 数据库设计（E-R 图）、系统详细设计说明书、UML 类图、分层架构图
 
-ruoyi-system: 核心业务逻辑与数据访问层。
+## 🤝 贡献指南
 
-ruoyi-framework: 框架核心配置与安全拦截。
+欢迎提交 Issue 和 Pull Request 来完善项目。建议：
+1. Fork 本仓库
+2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交改动 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 提交 Pull Request
 
-ruoyi-common: 通用工具类与常量。
+## 📜 许可证
 
-9. 部署与运维
-打包: 在项目根目录下运行 mvn clean package，在 ruoyi-admin/target 目录下会生成可执行的 jar 包。
-
-运行脚本: 提供了便捷的启动脚本，Windows 环境下使用 ry.bat，Linux 环境下使用 ry.sh。
-
-监控: 内置了服务器监控（ServerController）、缓存监控（CacheController）以及 Druid 数据库连接池监控，方便运维人员实时掌握系统状态。
-
-10. 故障排除
-验证码无法显示 / Redis报错: 请确保本地或服务器上的 Redis 服务已启动，且 application.yml 中的端口和密码配置正确。
-
-数据库连接失败: 检查 MySQL 服务状态，确认 application-druid.yml 中的用户名密码是否匹配。
-
-依赖下载失败: 尝试清理 Maven 缓存或更换阿里云 Maven 镜像源后重新导入。
-
-11. 更新日志
-v1.0.0 * 完成基础若依框架的搭建与精简。
-
-整合原神业务模块：角色、武器、圣遗物、秘境基础 CRUD 功能。
-
-上线角色养成计算器与推荐配队功能。
-
-完善数据库 E-R 图与系统详细设计说明书。
+本项目基于 MIT 许可证开源，详情见 [LICENSE](LICENSE) 文件。
