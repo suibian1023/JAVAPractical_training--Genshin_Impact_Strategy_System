@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.GenshinCharacterMapper">
+    
+    <resultMap type="GenshinCharacter" id="GenshinCharacterResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="title"    column="title"    />
+        <result property="description"    column="description"    />
+        <result property="weaponType"    column="weapon_type"    />
+        <result property="weaponText"    column="weapon_text"    />
+        <result property="bodyType"    column="body_type"    />
+        <result property="gender"    column="gender"    />
+        <result property="qualityType"    column="quality_type"    />
+        <result property="rarity"    column="rarity"    />
+        <result property="birthdayMmdd"    column="birthday_mmdd"    />
+        <result property="birthday"    column="birthday"    />
+        <result property="elementType"    column="element_type"    />
+        <result property="elementText"    column="element_text"    />
+        <result property="affiliation"    column="affiliation"    />
+        <result property="associationType"    column="association_type"    />
+        <result property="region"    column="region"    />
+        <result property="substatType"    column="substat_type"    />
+        <result property="substatText"    column="substat_text"    />
+        <result property="constellation"    column="constellation"    />
+        <result property="cvChinese"    column="cv_chinese"    />
+        <result property="cvEnglish"    column="cv_english"    />
+        <result property="cvJapanese"    column="cv_japanese"    />
+        <result property="cvKorean"    column="cv_korean"    />
+    </resultMap>
+
+    <sql id="selectGenshinCharacterVo">
+        select id, name, title, description, weapon_type, weapon_text, body_type, gender, quality_type, rarity, birthday_mmdd, birthday, element_type, element_text, affiliation, association_type, region, substat_type, substat_text, constellation, cv_chinese, cv_english, cv_japanese, cv_korean from genshin_character
+    </sql>
+
+    <select id="selectGenshinCharacterList" parameterType="GenshinCharacter" resultMap="GenshinCharacterResult">
+        <include refid="selectGenshinCharacterVo"/>
+        <where>  
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="title != null  and title != ''"> and title = #{title}</if>
+            <if test="description != null  and description != ''"> and description = #{description}</if>
+            <if test="weaponType != null  and weaponType != ''"> and weapon_type = #{weaponType}</if>
+            <if test="weaponText != null  and weaponText != ''"> and weapon_text = #{weaponText}</if>
+            <if test="bodyType != null  and bodyType != ''"> and body_type = #{bodyType}</if>
+            <if test="gender != null  and gender != ''"> and gender = #{gender}</if>
+            <if test="qualityType != null  and qualityType != ''"> and quality_type = #{qualityType}</if>
+            <if test="rarity != null "> and rarity = #{rarity}</if>
+            <if test="birthdayMmdd != null  and birthdayMmdd != ''"> and birthday_mmdd = #{birthdayMmdd}</if>
+            <if test="birthday != null  and birthday != ''"> and birthday = #{birthday}</if>
+            <if test="elementType != null  and elementType != ''"> and element_type = #{elementType}</if>
+            <if test="elementText != null  and elementText != ''"> and element_text = #{elementText}</if>
+            <if test="affiliation != null  and affiliation != ''"> and affiliation = #{affiliation}</if>
+            <if test="associationType != null  and associationType != ''"> and association_type = #{associationType}</if>
+            <if test="region != null  and region != ''"> and region = #{region}</if>
+            <if test="substatType != null  and substatType != ''"> and substat_type = #{substatType}</if>
+            <if test="substatText != null  and substatText != ''"> and substat_text = #{substatText}</if>
+            <if test="constellation != null  and constellation != ''"> and constellation = #{constellation}</if>
+            <if test="cvChinese != null  and cvChinese != ''"> and cv_chinese = #{cvChinese}</if>
+            <if test="cvEnglish != null  and cvEnglish != ''"> and cv_english = #{cvEnglish}</if>
+            <if test="cvJapanese != null  and cvJapanese != ''"> and cv_japanese = #{cvJapanese}</if>
+            <if test="cvKorean != null  and cvKorean != ''"> and cv_korean = #{cvKorean}</if>
+        </where>
+    </select>
+    
+    <select id="selectGenshinCharacterById" parameterType="Long" resultMap="GenshinCharacterResult">
+        <include refid="selectGenshinCharacterVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertGenshinCharacter" parameterType="GenshinCharacter">
+        insert into genshin_character
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="name != null and name != ''">name,</if>
+            <if test="title != null">title,</if>
+            <if test="description != null">description,</if>
+            <if test="weaponType != null and weaponType != ''">weapon_type,</if>
+            <if test="weaponText != null and weaponText != ''">weapon_text,</if>
+            <if test="bodyType != null">body_type,</if>
+            <if test="gender != null">gender,</if>
+            <if test="qualityType != null and qualityType != ''">quality_type,</if>
+            <if test="rarity != null">rarity,</if>
+            <if test="birthdayMmdd != null">birthday_mmdd,</if>
+            <if test="birthday != null">birthday,</if>
+            <if test="elementType != null and elementType != ''">element_type,</if>
+            <if test="elementText != null and elementText != ''">element_text,</if>
+            <if test="affiliation != null">affiliation,</if>
+            <if test="associationType != null">association_type,</if>
+            <if test="region != null">region,</if>
+            <if test="substatType != null and substatType != ''">substat_type,</if>
+            <if test="substatText != null and substatText != ''">substat_text,</if>
+            <if test="constellation != null">constellation,</if>
+            <if test="cvChinese != null">cv_chinese,</if>
+            <if test="cvEnglish != null">cv_english,</if>
+            <if test="cvJapanese != null">cv_japanese,</if>
+            <if test="cvKorean != null">cv_korean,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="title != null">#{title},</if>
+            <if test="description != null">#{description},</if>
+            <if test="weaponType != null and weaponType != ''">#{weaponType},</if>
+            <if test="weaponText != null and weaponText != ''">#{weaponText},</if>
+            <if test="bodyType != null">#{bodyType},</if>
+            <if test="gender != null">#{gender},</if>
+            <if test="qualityType != null and qualityType != ''">#{qualityType},</if>
+            <if test="rarity != null">#{rarity},</if>
+            <if test="birthdayMmdd != null">#{birthdayMmdd},</if>
+            <if test="birthday != null">#{birthday},</if>
+            <if test="elementType != null and elementType != ''">#{elementType},</if>
+            <if test="elementText != null and elementText != ''">#{elementText},</if>
+            <if test="affiliation != null">#{affiliation},</if>
+            <if test="associationType != null">#{associationType},</if>
+            <if test="region != null">#{region},</if>
+            <if test="substatType != null and substatType != ''">#{substatType},</if>
+            <if test="substatText != null and substatText != ''">#{substatText},</if>
+            <if test="constellation != null">#{constellation},</if>
+            <if test="cvChinese != null">#{cvChinese},</if>
+            <if test="cvEnglish != null">#{cvEnglish},</if>
+            <if test="cvJapanese != null">#{cvJapanese},</if>
+            <if test="cvKorean != null">#{cvKorean},</if>
+         </trim>
+    </insert>
+
+    <update id="updateGenshinCharacter" parameterType="GenshinCharacter">
+        update genshin_character
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="title != null">title = #{title},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="weaponType != null and weaponType != ''">weapon_type = #{weaponType},</if>
+            <if test="weaponText != null and weaponText != ''">weapon_text = #{weaponText},</if>
+            <if test="bodyType != null">body_type = #{bodyType},</if>
+            <if test="gender != null">gender = #{gender},</if>
+            <if test="qualityType != null and qualityType != ''">quality_type = #{qualityType},</if>
+            <if test="rarity != null">rarity = #{rarity},</if>
+            <if test="birthdayMmdd != null">birthday_mmdd = #{birthdayMmdd},</if>
+            <if test="birthday != null">birthday = #{birthday},</if>
+            <if test="elementType != null and elementType != ''">element_type = #{elementType},</if>
+            <if test="elementText != null and elementText != ''">element_text = #{elementText},</if>
+            <if test="affiliation != null">affiliation = #{affiliation},</if>
+            <if test="associationType != null">association_type = #{associationType},</if>
+            <if test="region != null">region = #{region},</if>
+            <if test="substatType != null and substatType != ''">substat_type = #{substatType},</if>
+            <if test="substatText != null and substatText != ''">substat_text = #{substatText},</if>
+            <if test="constellation != null">constellation = #{constellation},</if>
+            <if test="cvChinese != null">cv_chinese = #{cvChinese},</if>
+            <if test="cvEnglish != null">cv_english = #{cvEnglish},</if>
+            <if test="cvJapanese != null">cv_japanese = #{cvJapanese},</if>
+            <if test="cvKorean != null">cv_korean = #{cvKorean},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteGenshinCharacterById" parameterType="Long">
+        delete from genshin_character where id = #{id}
+    </delete>
+
+    <delete id="deleteGenshinCharacterByIds" parameterType="String">
+        delete from genshin_character where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

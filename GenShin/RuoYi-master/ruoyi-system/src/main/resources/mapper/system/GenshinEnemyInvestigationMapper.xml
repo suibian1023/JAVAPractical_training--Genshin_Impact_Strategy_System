@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.GenshinEnemyInvestigationMapper">
+    
+    <resultMap type="GenshinEnemyInvestigation" id="GenshinEnemyInvestigationResult">
+        <result property="id"    column="id"    />
+        <result property="enemyId"    column="enemy_id"    />
+        <result property="investigationId"    column="investigation_id"    />
+        <result property="name"    column="name"    />
+        <result property="categoryType"    column="category_type"    />
+        <result property="categoryText"    column="category_text"    />
+        <result property="description"    column="description"    />
+        <result property="lockdesc"    column="lockdesc"    />
+    </resultMap>
+
+    <sql id="selectGenshinEnemyInvestigationVo">
+        select id, enemy_id, investigation_id, name, category_type, category_text, description, lockdesc from genshin_enemy_investigation
+    </sql>
+
+    <select id="selectGenshinEnemyInvestigationList" parameterType="GenshinEnemyInvestigation" resultMap="GenshinEnemyInvestigationResult">
+        <include refid="selectGenshinEnemyInvestigationVo"/>
+        <where>  
+            <if test="enemyId != null "> and enemy_id = #{enemyId}</if>
+            <if test="investigationId != null "> and investigation_id = #{investigationId}</if>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="categoryType != null  and categoryType != ''"> and category_type = #{categoryType}</if>
+            <if test="categoryText != null  and categoryText != ''"> and category_text = #{categoryText}</if>
+            <if test="description != null  and description != ''"> and description = #{description}</if>
+            <if test="lockdesc != null  and lockdesc != ''"> and lockdesc = #{lockdesc}</if>
+        </where>
+    </select>
+    
+    <select id="selectGenshinEnemyInvestigationById" parameterType="Long" resultMap="GenshinEnemyInvestigationResult">
+        <include refid="selectGenshinEnemyInvestigationVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertGenshinEnemyInvestigation" parameterType="GenshinEnemyInvestigation" useGeneratedKeys="true" keyProperty="id">
+        insert into genshin_enemy_investigation
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="enemyId != null">enemy_id,</if>
+            <if test="investigationId != null">investigation_id,</if>
+            <if test="name != null">name,</if>
+            <if test="categoryType != null">category_type,</if>
+            <if test="categoryText != null">category_text,</if>
+            <if test="description != null">description,</if>
+            <if test="lockdesc != null">lockdesc,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="enemyId != null">#{enemyId},</if>
+            <if test="investigationId != null">#{investigationId},</if>
+            <if test="name != null">#{name},</if>
+            <if test="categoryType != null">#{categoryType},</if>
+            <if test="categoryText != null">#{categoryText},</if>
+            <if test="description != null">#{description},</if>
+            <if test="lockdesc != null">#{lockdesc},</if>
+         </trim>
+    </insert>
+
+    <update id="updateGenshinEnemyInvestigation" parameterType="GenshinEnemyInvestigation">
+        update genshin_enemy_investigation
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="enemyId != null">enemy_id = #{enemyId},</if>
+            <if test="investigationId != null">investigation_id = #{investigationId},</if>
+            <if test="name != null">name = #{name},</if>
+            <if test="categoryType != null">category_type = #{categoryType},</if>
+            <if test="categoryText != null">category_text = #{categoryText},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="lockdesc != null">lockdesc = #{lockdesc},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteGenshinEnemyInvestigationById" parameterType="Long">
+        delete from genshin_enemy_investigation where id = #{id}
+    </delete>
+
+    <delete id="deleteGenshinEnemyInvestigationByIds" parameterType="String">
+        delete from genshin_enemy_investigation where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

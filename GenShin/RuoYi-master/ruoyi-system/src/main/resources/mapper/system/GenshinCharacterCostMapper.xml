@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.GenshinCharacterCostMapper">
+    
+    <resultMap type="GenshinCharacterCost" id="GenshinCharacterCostResult">
+        <result property="id"    column="id"    />
+        <result property="characterId"    column="character_id"    />
+        <result property="ascendLevel"    column="ascend_level"    />
+        <result property="itemId"    column="item_id"    />
+        <result property="itemName"    column="item_name"    />
+        <result property="itemCount"    column="item_count"    />
+    </resultMap>
+
+    <sql id="selectGenshinCharacterCostVo">
+        select id, character_id, ascend_level, item_id, item_name, item_count from genshin_character_cost
+    </sql>
+
+    <select id="selectGenshinCharacterCostList" parameterType="GenshinCharacterCost" resultMap="GenshinCharacterCostResult">
+        <include refid="selectGenshinCharacterCostVo"/>
+        <where>  
+            <if test="characterId != null"> and character_id = #{characterId}</if>
+            <if test="ascendLevel != null"> and ascend_level = #{ascendLevel}</if>
+            <if test="itemName != null and itemName != ''"> and item_name like concat('%', #{itemName}, '%')</if>
+        </where>
+        order by ascend_level asc
+    </select>
+    
+    <select id="selectGenshinCharacterCostById" parameterType="Long" resultMap="GenshinCharacterCostResult">
+        <include refid="selectGenshinCharacterCostVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertGenshinCharacterCost" parameterType="GenshinCharacterCost" useGeneratedKeys="true" keyProperty="id">
+        insert into genshin_character_cost
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="characterId != null">character_id,</if>
+            <if test="ascendLevel != null">ascend_level,</if>
+            <if test="itemId != null">item_id,</if>
+            <if test="itemName != null">item_name,</if>
+            <if test="itemCount != null">item_count,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="characterId != null">#{characterId},</if>
+            <if test="ascendLevel != null">#{ascendLevel},</if>
+            <if test="itemId != null">#{itemId},</if>
+            <if test="itemName != null">#{itemName},</if>
+            <if test="itemCount != null">#{itemCount},</if>
+         </trim>
+    </insert>
+
+    <update id="updateGenshinCharacterCost" parameterType="GenshinCharacterCost">
+        update genshin_character_cost
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="characterId != null">character_id = #{characterId},</if>
+            <if test="ascendLevel != null">ascend_level = #{ascendLevel},</if>
+            <if test="itemId != null">item_id = #{itemId},</if>
+            <if test="itemName != null">item_name = #{itemName},</if>
+            <if test="itemCount != null">item_count = #{itemCount},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteGenshinCharacterCostById" parameterType="Long">
+        delete from genshin_character_cost where id = #{id}
+    </delete>
+
+    <delete id="deleteGenshinCharacterCostByIds" parameterType="String">
+        delete from genshin_character_cost where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

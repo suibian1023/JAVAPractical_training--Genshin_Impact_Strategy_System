@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('角色培养路线图')" />
+    <style>
+        .info-label { font-weight: 700; color: #666; }
+        .info-value { color: #333; }
+        .section-title { border-bottom: 2px solid #3c8dbc; padding-bottom: 5px; margin-bottom: 8px; font-size: 15px; font-weight: 700; }
+        .team-card { border: 1px solid #e3e3e3; border-radius: 4px; padding: 10px; margin-bottom: 5px; background: #f9f9f9; }
+        .team-card h4 { margin-top: 0; }
+        .label-t0 { background-color: #e74c3c; }
+        .label-t1 { background-color: #f39c12; }
+        .label-t2 { background-color: #3498db; }
+        .build-section { margin-bottom: 0; }
+        .build-section .box { margin-bottom: 5px; }
+        .build-section .box-body { padding: 8px 15px; }
+    </style>
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content" style="padding-top: 5px;">
+        <a class="btn btn-primary btn-sm" onclick="history.back()"><i class="fa fa-arrow-left"></i> 返回列表</a>
+        <div style="height: 5px;"></div>
+
+        <!-- ==================== 1. 角色基本资料 ==================== -->
+        <div class="row build-section">
+            <div class="col-sm-12">
+                <div class="box box-solid">
+                    <div class="box-header with-border">
+                        <h3 class="box-title section-title">
+                            <i class="fa fa-user"></i> 角色基本资料
+                        </h3>
+                    </div>
+                    <div class="box-body">
+                        <table class="table table-bordered">
+                            <tr>
+                                <td class="info-label" width="12%">角色名称</td>
+                                <td class="info-value" width="38%" th:text="${character.name}"></td>
+                                <td class="info-label" width="12%">角色称号</td>
+                                <td class="info-value" width="38%" th:text="${character.title}"></td>
+                            </tr>
+                            <tr>
+                                <td class="info-label">星级</td>
+                                <td class="info-value">
+                                    <span th:if="${character.rarity == 5}" style="color:#f5a623;">★★★★★</span>
+                                    <span th:if="${character.rarity == 4}" style="color:#a335ee;">★★★★</span>
+                                    <span th:if="${character.rarity != 5 and character.rarity != 4}" th:text="${character.rarity}"></span>
+                                </td>
+                                <td class="info-label">元素</td>
+                                <td class="info-value" th:text="${character.elementText}"></td>
+                            </tr>
+                            <tr>
+                                <td class="info-label">武器类型</td>
+                                <td class="info-value" th:text="${character.weaponText}"></td>
+                                <td class="info-label">命之座</td>
+                                <td class="info-value" th:text="${character.constellation}"></td>
+                            </tr>
+                            <tr>
+                                <td class="info-label">所属</td>
+                                <td class="info-value" th:text="${character.affiliation}"></td>
+                                <td class="info-label">地区</td>
+                                <td class="info-value" th:text="${character.region}"></td>
+                            </tr>
+                            <tr>
+                                <td class="info-label">生日</td>
+                                <td class="info-value" th:text="${character.birthday}"></td>
+                                <td class="info-label">性别</td>
+                                <td class="info-value" th:text="${character.gender}"></td>
+                            </tr>
+                            <tr>
+                                <td class="info-label">中文CV</td>
+                                <td class="info-value" th:text="${character.cvChinese}"></td>
+                                <td class="info-label">日文CV</td>
+                                <td class="info-value" th:text="${character.cvJapanese}"></td>
+                            </tr>
+                            <tr>
+                                <td class="info-label">英文CV</td>
+                                <td class="info-value" th:text="${character.cvEnglish}"></td>
+                                <td class="info-label">韩文CV</td>
+                                <td class="info-value" th:text="${character.cvKorean}"></td>
+                            </tr>
+                            <tr th:if="${character.description != null and character.description != ''}">
+                                <td class="info-label">角色描述</td>
+                                <td class="info-value" colspan="3" th:text="${character.description}"></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== 2. 推荐武器 ==================== -->
+        <div class="row build-section" th:if="${not #lists.isEmpty(weapons)}">
+            <div class="col-sm-12">
+                <div class="box box-solid">
+                    <div class="box-header with-border">
+                        <h3 class="box-title section-title">
+                            <i class="fa fa-shield"></i> 推荐武器
+                        </h3>
+                    </div>
+                    <div class="box-body">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>武器名称</th>
+                                    <th>推荐梯度</th>
+                                    <th>备注</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="weapon, iter : ${weapons}">
+                                    <td th:text="${iter.count}"></td>
+                                    <td th:text="${weapon.weaponName}"></td>
+                                    <td>
+                                        <span class="label label-t0" th:if="${weapon.recommendDegree == 'T0'}">T0 专武</span>
+                                        <span class="label label-t1" th:if="${weapon.recommendDegree == 'T1'}">T1 极佳</span>
+                                        <span class="label label-t2" th:if="${weapon.recommendDegree == 'T2'}">T2 过渡</span>
+                                        <span th:if="${weapon.recommendDegree != 'T0' and weapon.recommendDegree != 'T1' and weapon.recommendDegree != 'T2'}" th:text="${weapon.recommendDegree}"></span>
+                                    </td>
+                                    <td th:text="${weapon.remark}"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== 3. 圣遗物推荐 ==================== -->
+        <div class="row build-section" th:if="${not #lists.isEmpty(artifacts)}">
+            <div class="col-sm-12">
+                <div class="box box-solid">
+                    <div class="box-header with-border">
+                        <h3 class="box-title section-title">
+                            <i class="fa fa-diamond"></i> 圣遗物推荐
+                        </h3>
+                    </div>
+                    <div class="box-body">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>圣遗物套装</th>
+                                    <th>件套需求</th>
+                                    <th>沙漏主词条</th>
+                                    <th>杯子主词条</th>
+                                    <th>头冠主词条</th>
+                                    <th>副词条优先级</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="artifact, iter : ${artifacts}">
+                                    <td th:text="${iter.count}"></td>
+                                    <td th:text="${artifact.artifactName}"></td>
+                                    <td th:text="${artifact.pieces}"></td>
+                                    <td th:text="${artifact.sandStat}"></td>
+                                    <td th:text="${artifact.cupStat}"></td>
+                                    <td th:text="${artifact.crownStat}"></td>
+                                    <td th:text="${artifact.subStats}"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== 4. 配队推荐 ==================== -->
+        <div class="row build-section" th:if="${not #lists.isEmpty(teams)}">
+            <div class="col-sm-12">
+                <div class="box box-solid">
+                    <div class="box-header with-border">
+                        <h3 class="box-title section-title">
+                            <i class="fa fa-users"></i> 配队推荐
+                        </h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-sm-6" th:each="team, iter : ${teams}">
+                                <div class="team-card">
+                                    <h4 th:text="${team.teamName}"></h4>
+                                    <p><strong>队伍配置：</strong>
+                                        <span class="label label-info" th:text="${team.char1Name}"></span>
+                                        <span th:if="${team.char2Name != null}"> + </span>
+                                        <span class="label label-info" th:if="${team.char2Name != null}" th:text="${team.char2Name}"></span>
+                                        <span th:if="${team.char3Name != null}"> + </span>
+                                        <span class="label label-info" th:if="${team.char3Name != null}" th:text="${team.char3Name}"></span>
+                                        <span th:if="${team.char4Name != null}"> + </span>
+                                        <span class="label label-info" th:if="${team.char4Name != null}" th:text="${team.char4Name}"></span>
+                                    </p>
+                                    <p th:if="${team.teamBonus != null and team.teamBonus != ''}"><strong>元素共鸣：</strong><span th:text="${team.teamBonus}"></span></p>
+                                    <p th:if="${team.rotation != null and team.rotation != ''}"><strong>输出手法：</strong><br><span th:text="${team.rotation}"></span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== 5. 天赋升级材料 ==================== -->
+        <div class="row build-section" th:if="${not #lists.isEmpty(talentCosts)}">
+            <div class="col-sm-12">
+                <div class="box box-solid">
+                    <div class="box-header with-border">
+                        <h3 class="box-title section-title">
+                            <i class="fa fa-book"></i> 天赋升级材料
+                        </h3>
+                    </div>
+                    <div class="box-body">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>天赋等级</th>
+                                    <th>材料名称</th>
+                                    <th>所需数量</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="cost : ${talentCosts}">
+                                    <td th:text="${cost.level}"></td>
+                                    <td th:text="${cost.materialName}"></td>
+                                    <td th:text="${cost.count}"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <th:block th:include="include :: footer" />
+</body>
+</html>

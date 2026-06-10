@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('修改角色圣遗物推荐')" />
+    <th:block th:include="include :: select2-css" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-artifact-edit" th:object="${genshinRecommendArtifact}">
+            <input name="id" th:field="*{id}" type="hidden">
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label is-required">角色：</label>
+                    <div class="col-sm-8">
+                        <select name="characterId" class="form-control" required th:field="*{characterId}">
+                            <option value="">--- 请选择角色 ---</option>
+                            <option th:each="character : ${characters}" th:value="${character.id}" th:text="${character.name}" th:selected="${character.id == genshinRecommendArtifact.characterId}"></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label is-required">推荐圣遗物套装：</label>
+                    <div class="col-sm-8">
+                        <select name="artifactId" class="form-control" required th:field="*{artifactId}">
+                            <option value="">--- 请选择圣遗物套装 ---</option>
+                            <option th:each="artifact : ${artifacts}" th:value="${artifact.dictValue}" th:text="${artifact.dictLabel}" th:selected="${artifact.dictValue == genshinRecommendArtifact.artifactId}"></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">件套需求: 4件套/2件套：</label>
+                    <div class="col-sm-8">
+                        <input name="pieces" th:field="*{pieces}" class="form-control" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">沙漏主词条推荐(如: 攻击力/充能)：</label>
+                    <div class="col-sm-8">
+                        <input name="sandStat" th:field="*{sandStat}" class="form-control" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">杯子主词条推荐(如: 冰元素伤害/物理伤害)：</label>
+                    <div class="col-sm-8">
+                        <input name="cupStat" th:field="*{cupStat}" class="form-control" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">头冠主词条推荐(如: 暴击率/暴击伤害)：</label>
+                    <div class="col-sm-8">
+                        <input name="crownStat" th:field="*{crownStat}" class="form-control" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">副词条优先级(如: 双暴>攻击>充能)：</label>
+                    <div class="col-sm-8">
+                        <input name="subStats" th:field="*{subStats}" class="form-control" type="text">
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: select2-js" />
+    <script th:inline="javascript">
+        var prefix = ctx + "system/artifact";
+        $('select').select2();
+        $("#form-artifact-edit").validate({
+            focusCleanup: true
+        });
+
+        function submitHandler() {
+            if ($.validate.form()) {
+                $.operate.save(prefix + "/edit", $('#form-artifact-edit').serialize());
+            }
+        }
+    </script>
+</body>
+</html>

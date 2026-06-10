@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.GenshinRecommendTeamMapper">
+
+    <resultMap type="GenshinRecommendTeam" id="GenshinRecommendTeamResult">
+        <result property="id"    column="id"    />
+        <result property="teamName"    column="team_name"    />
+        <result property="char1Id"    column="char1_id"    />
+        <result property="char2Id"    column="char2_id"    />
+        <result property="char3Id"    column="char3_id"    />
+        <result property="char4Id"    column="char4_id"    />
+        <result property="teamBonus"    column="team_bonus"    />
+        <result property="rotation"    column="rotation"    />
+
+        <result property="char1Name"    column="char1Name"    />
+        <result property="char2Name"    column="char2Name"    />
+        <result property="char3Name"    column="char3Name"    />
+        <result property="char4Name"    column="char4Name"    />
+    </resultMap>
+
+    <sql id="selectGenshinRecommendTeamVo">
+        select t.id, t.team_name, t.char1_id, t.char2_id, t.char3_id, t.char4_id, t.team_bonus, t.rotation,
+        c1.name as char1Name,
+        c2.name as char2Name,
+        c3.name as char3Name,
+        c4.name as char4Name
+        from genshin_recommend_team t
+        left join genshin_character c1 on t.char1_id = c1.id
+        left join genshin_character c2 on t.char2_id = c2.id
+        left join genshin_character c3 on t.char3_id = c3.id
+        left join genshin_character c4 on t.char4_id = c4.id
+    </sql>
+
+    <select id="selectGenshinRecommendTeamList" parameterType="GenshinRecommendTeam" resultMap="GenshinRecommendTeamResult">
+        <include refid="selectGenshinRecommendTeamVo"/>
+        <where>
+            <if test="teamName != null  and teamName != ''"> and t.team_name like concat('%', #{teamName}, '%')</if>
+            <if test="char1Id != null "> and t.char1_id = #{char1Id}</if>
+            <if test="char2Id != null "> and t.char2_id = #{char2Id}</if>
+            <if test="char3Id != null "> and t.char3_id = #{char3Id}</if>
+            <if test="char4Id != null "> and t.char4_id = #{char4Id}</if>
+            <if test="teamBonus != null  and teamBonus != ''"> and t.team_bonus = #{teamBonus}</if>
+            <if test="rotation != null  and rotation != ''"> and t.rotation = #{rotation}</if>
+        </where>
+    </select>
+
+    <select id="selectGenshinRecommendTeamById" parameterType="Long" resultMap="GenshinRecommendTeamResult">
+        <include refid="selectGenshinRecommendTeamVo"/>
+        where t.id = #{id}
+    </select>
+
+    <insert id="insertGenshinRecommendTeam" parameterType="GenshinRecommendTeam" useGeneratedKeys="true" keyProperty="id">
+        insert into genshin_recommend_team
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="teamName != null and teamName != ''">team_name,</if>
+            <if test="char1Id != null">char1_id,</if>
+            <if test="char2Id != null">char2_id,</if>
+            <if test="char3Id != null">char3_id,</if>
+            <if test="char4Id != null">char4_id,</if>
+            <if test="teamBonus != null">team_bonus,</if>
+            <if test="rotation != null">rotation,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="teamName != null and teamName != ''">#{teamName},</if>
+            <if test="char1Id != null">#{char1Id},</if>
+            <if test="char2Id != null">#{char2Id},</if>
+            <if test="char3Id != null">#{char3Id},</if>
+            <if test="char4Id != null">#{char4Id},</if>
+            <if test="teamBonus != null">#{teamBonus},</if>
+            <if test="rotation != null">#{rotation},</if>
+        </trim>
+    </insert>
+
+    <update id="updateGenshinRecommendTeam" parameterType="GenshinRecommendTeam">
+        update genshin_recommend_team
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="teamName != null and teamName != ''">team_name = #{teamName},</if>
+            <if test="char1Id != null">char1_id = #{char1Id},</if>
+            <if test="char2Id != null">char2_id = #{char2Id},</if>
+            <if test="char3Id != null">char3_id = #{char3Id},</if>
+            <if test="char4Id != null">char4_id = #{char4Id},</if>
+            <if test="teamBonus != null">team_bonus = #{teamBonus},</if>
+            <if test="rotation != null">rotation = #{rotation},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteGenshinRecommendTeamById" parameterType="Long">
+        delete from genshin_recommend_team where id = #{id}
+    </delete>
+
+    <delete id="deleteGenshinRecommendTeamByIds" parameterType="String">
+        delete from genshin_recommend_team where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('新增原神武器信息')" />
+    <th:block th:include="include :: select2-css" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-weapon-add">
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label is-required">武器名称：</label>
+                    <div class="col-sm-8">
+                        <input name="name" class="form-control" type="text" required>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label is-required">武器类型：</label>
+                    <div class="col-sm-8">
+                        <select name="weaponType" class="form-control" required>
+                            <option value="">--- 请选择 ---</option>
+                            <option value="SWORD">单手剑</option>
+                            <option value="CLAYMORE">双手剑</option>
+                            <option value="POLEARM">长柄武器</option>
+                            <option value="BOW">弓</option>
+                            <option value="CATALYST">法器</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">武器类型名称：</label>
+                    <div class="col-sm-8">
+                        <input name="weaponText" class="form-control" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label is-required">星级：</label>
+                    <div class="col-sm-8">
+                        <select name="rarity" class="form-control" required>
+                            <option value="">--- 请选择 ---</option>
+                            <option value="5">5星</option>
+                            <option value="4">4星</option>
+                            <option value="3">3星</option>
+                            <option value="2">2星</option>
+                            <option value="1">1星</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">基础攻击力：</label>
+                    <div class="col-sm-8">
+                        <input name="baseAtkValue" class="form-control" type="number" step="0.01">
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">主属性类型：</label>
+                    <div class="col-sm-8">
+                        <input name="mainStatType" class="form-control" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">主属性名称：</label>
+                    <div class="col-sm-8">
+                        <input name="mainStatText" class="form-control" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">基础属性文本：</label>
+                    <div class="col-sm-8">
+                        <input name="baseStatText" class="form-control" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">武器效果名称：</label>
+                    <div class="col-sm-8">
+                        <input name="effectName" class="form-control" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">武器描述：</label>
+                    <div class="col-sm-8">
+                        <textarea name="description" class="form-control"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">武器故事：</label>
+                    <div class="col-sm-8">
+                        <textarea name="story" class="form-control"></textarea>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: select2-js" />
+    <script th:inline="javascript">
+        var prefix = ctx + "system/weapon"
+        $('select').select2();
+        $("#form-weapon-add").validate({
+            focusCleanup: true
+        });
+
+        function submitHandler() {
+            if ($.validate.form()) {
+                $.operate.save(prefix + "/add", $('#form-weapon-add').serialize());
+            }
+        }
+    </script>
+</body>
+</html>

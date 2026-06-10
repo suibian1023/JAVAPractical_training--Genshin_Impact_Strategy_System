@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('新增推荐武器')" />
+    <th:block th:include="include :: select2-css" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-recommendWeapon-add">
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label is-required">角色：</label>
+                    <div class="col-sm-8">
+                        <select name="characterId" class="form-control" required>
+                            <option value="">--- 请选择角色 ---</option>
+                            <option th:each="character : ${characterList}" th:value="${character.id}" th:text="${character.name}"></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label is-required">推荐武器：</label>
+                    <div class="col-sm-8">
+                        <select name="weaponId" class="form-control" required>
+                            <option value="">--- 请选择武器 ---</option>
+                            <option th:each="weapon : ${weaponList}" th:value="${weapon.id}" th:text="${weapon.name}"></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">推荐梯度：</label>
+                    <div class="col-sm-8">
+                        <select name="recommendDegree" class="form-control">
+                            <option value="">--- 请选择梯度 ---</option>
+                            <option value="T0">T0专武</option>
+                            <option value="T1">T1极佳</option>
+                            <option value="T2">T2过渡</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">推荐理由/手法说明：</label>
+                    <div class="col-sm-8">
+                        <textarea name="remark" class="form-control"></textarea>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: select2-js" />
+    <script th:inline="javascript">
+        var prefix = ctx + "system/recommendWeapon"
+        $('select').select2();
+        $("#form-recommendWeapon-add").validate({
+            focusCleanup: true
+        });
+
+        function submitHandler() {
+            if ($.validate.form()) {
+                $.operate.save(prefix + "/add", $('#form-recommendWeapon-add').serialize());
+            }
+        }
+    </script>
+</body>
+</html>

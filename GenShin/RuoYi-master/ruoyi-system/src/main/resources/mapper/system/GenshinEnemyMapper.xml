@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.GenshinEnemyMapper">
+    
+    <resultMap type="GenshinEnemy" id="GenshinEnemyResult">
+        <result property="id"    column="id"    />
+        <result property="monsterId"    column="monster_id"    />
+        <result property="name"    column="name"    />
+        <result property="specialNames"    column="special_names"    />
+        <result property="monsterType"    column="monster_type"    />
+        <result property="enemyType"    column="enemy_type"    />
+        <result property="categoryType"    column="category_type"    />
+        <result property="categoryText"    column="category_text"    />
+        <result property="description"    column="description"    />
+    </resultMap>
+
+    <sql id="selectGenshinEnemyVo">
+        select id, monster_id, name, special_names, monster_type, enemy_type, category_type, category_text, description from genshin_enemy
+    </sql>
+
+    <select id="selectGenshinEnemyList" parameterType="GenshinEnemy" resultMap="GenshinEnemyResult">
+        <include refid="selectGenshinEnemyVo"/>
+        <where>  
+            <if test="monsterId != null "> and monster_id = #{monsterId}</if>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="specialNames != null  and specialNames != ''"> and special_names = #{specialNames}</if>
+            <if test="monsterType != null  and monsterType != ''"> and monster_type = #{monsterType}</if>
+            <if test="enemyType != null  and enemyType != ''"> and enemy_type = #{enemyType}</if>
+            <if test="categoryType != null  and categoryType != ''"> and category_type = #{categoryType}</if>
+            <if test="categoryText != null  and categoryText != ''"> and category_text = #{categoryText}</if>
+            <if test="description != null  and description != ''"> and description = #{description}</if>
+        </where>
+    </select>
+    
+    <select id="selectGenshinEnemyById" parameterType="Long" resultMap="GenshinEnemyResult">
+        <include refid="selectGenshinEnemyVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertGenshinEnemy" parameterType="GenshinEnemy">
+        insert into genshin_enemy
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="monsterId != null">monster_id,</if>
+            <if test="name != null and name != ''">name,</if>
+            <if test="specialNames != null">special_names,</if>
+            <if test="monsterType != null">monster_type,</if>
+            <if test="enemyType != null">enemy_type,</if>
+            <if test="categoryType != null">category_type,</if>
+            <if test="categoryText != null">category_text,</if>
+            <if test="description != null">description,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="monsterId != null">#{monsterId},</if>
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="specialNames != null">#{specialNames},</if>
+            <if test="monsterType != null">#{monsterType},</if>
+            <if test="enemyType != null">#{enemyType},</if>
+            <if test="categoryType != null">#{categoryType},</if>
+            <if test="categoryText != null">#{categoryText},</if>
+            <if test="description != null">#{description},</if>
+         </trim>
+    </insert>
+
+    <update id="updateGenshinEnemy" parameterType="GenshinEnemy">
+        update genshin_enemy
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="monsterId != null">monster_id = #{monsterId},</if>
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="specialNames != null">special_names = #{specialNames},</if>
+            <if test="monsterType != null">monster_type = #{monsterType},</if>
+            <if test="enemyType != null">enemy_type = #{enemyType},</if>
+            <if test="categoryType != null">category_type = #{categoryType},</if>
+            <if test="categoryText != null">category_text = #{categoryText},</if>
+            <if test="description != null">description = #{description},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteGenshinEnemyById" parameterType="Long">
+        delete from genshin_enemy where id = #{id}
+    </delete>
+
+    <delete id="deleteGenshinEnemyByIds" parameterType="String">
+        delete from genshin_enemy where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.TalentCostsMapper">
+    
+    <resultMap type="TalentCosts" id="TalentCostsResult">
+        <result property="id"    column="id"    />
+        <result property="characterId"    column="character_id"    />
+        <result property="level"    column="level"    />
+        <result property="materialId"    column="material_id"    />
+        <result property="materialName"    column="material_name"    />
+        <result property="count"    column="count"    />
+        <result property="createdAt"    column="created_at"    />
+    </resultMap>
+
+    <sql id="selectTalentCostsVo">
+        select id, character_id, level, material_id, material_name, count, created_at from talent_costs
+    </sql>
+
+    <select id="selectTalentCostsList" parameterType="TalentCosts" resultMap="TalentCostsResult">
+        <include refid="selectTalentCostsVo"/>
+        <where>  
+            <if test="characterId != null "> and character_id = #{characterId}</if>
+            <if test="level != null "> and level = #{level}</if>
+            <if test="materialId != null "> and material_id = #{materialId}</if>
+            <if test="materialName != null  and materialName != ''"> and material_name like concat('%', #{materialName}, '%')</if>
+            <if test="count != null "> and count = #{count}</if>
+            <if test="createdAt != null "> and created_at = #{createdAt}</if>
+        </where>
+        order by level asc
+    </select>
+    
+    <select id="selectTalentCostsById" parameterType="Long" resultMap="TalentCostsResult">
+        <include refid="selectTalentCostsVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertTalentCosts" parameterType="TalentCosts" useGeneratedKeys="true" keyProperty="id">
+        insert into talent_costs
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="characterId != null">character_id,</if>
+            <if test="level != null">level,</if>
+            <if test="materialId != null">material_id,</if>
+            <if test="materialName != null">material_name,</if>
+            <if test="count != null">count,</if>
+            <if test="createdAt != null">created_at,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="characterId != null">#{characterId},</if>
+            <if test="level != null">#{level},</if>
+            <if test="materialId != null">#{materialId},</if>
+            <if test="materialName != null">#{materialName},</if>
+            <if test="count != null">#{count},</if>
+            <if test="createdAt != null">#{createdAt},</if>
+         </trim>
+    </insert>
+
+    <update id="updateTalentCosts" parameterType="TalentCosts">
+        update talent_costs
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="characterId != null">character_id = #{characterId},</if>
+            <if test="level != null">level = #{level},</if>
+            <if test="materialId != null">material_id = #{materialId},</if>
+            <if test="materialName != null">material_name = #{materialName},</if>
+            <if test="count != null">count = #{count},</if>
+            <if test="createdAt != null">created_at = #{createdAt},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteTalentCostsById" parameterType="Long">
+        delete from talent_costs where id = #{id}
+    </delete>
+
+    <delete id="deleteTalentCostsByIds" parameterType="String">
+        delete from talent_costs where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

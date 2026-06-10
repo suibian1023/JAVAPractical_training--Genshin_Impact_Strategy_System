@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.GenshinDomainMapper">
+    
+    <resultMap type="GenshinDomain" id="GenshinDomainResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="regionId"    column="region_id"    />
+        <result property="regionName"    column="region_name"    />
+        <result property="entranceId"    column="entrance_id"    />
+        <result property="entranceName"    column="entrance_name"    />
+        <result property="domainType"    column="domain_type"    />
+        <result property="domainText"    column="domain_text"    />
+        <result property="description"    column="description"    />
+        <result property="recommendedLevel"    column="recommended_level"    />
+        <result property="recommendedElements"    column="recommended_elements"    />
+        <result property="unlockRank"    column="unlock_rank"    />
+        <result property="daysOfWeek"    column="days_of_week"    />
+        <result property="disorder"    column="disorder"    />
+    </resultMap>
+
+    <sql id="selectGenshinDomainVo">
+        select id, name, region_id, region_name, entrance_id, entrance_name, domain_type, domain_text, description, recommended_level, recommended_elements, unlock_rank, days_of_week, disorder from genshin_domain
+    </sql>
+
+    <select id="selectGenshinDomainList" parameterType="GenshinDomain" resultMap="GenshinDomainResult">
+        <include refid="selectGenshinDomainVo"/>
+        <where>  
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="regionId != null "> and region_id = #{regionId}</if>
+            <if test="regionName != null  and regionName != ''"> and region_name like concat('%', #{regionName}, '%')</if>
+            <if test="entranceId != null "> and entrance_id = #{entranceId}</if>
+            <if test="entranceName != null  and entranceName != ''"> and entrance_name like concat('%', #{entranceName}, '%')</if>
+            <if test="domainType != null  and domainType != ''"> and domain_type = #{domainType}</if>
+            <if test="domainText != null  and domainText != ''"> and domain_text = #{domainText}</if>
+            <if test="description != null  and description != ''"> and description = #{description}</if>
+            <if test="recommendedLevel != null "> and recommended_level = #{recommendedLevel}</if>
+            <if test="recommendedElements != null  and recommendedElements != ''"> and recommended_elements = #{recommendedElements}</if>
+            <if test="unlockRank != null "> and unlock_rank = #{unlockRank}</if>
+            <if test="daysOfWeek != null  and daysOfWeek != ''"> and days_of_week = #{daysOfWeek}</if>
+            <if test="disorder != null  and disorder != ''"> and disorder = #{disorder}</if>
+        </where>
+    </select>
+    
+    <select id="selectGenshinDomainById" parameterType="Long" resultMap="GenshinDomainResult">
+        <include refid="selectGenshinDomainVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertGenshinDomain" parameterType="GenshinDomain">
+        insert into genshin_domain
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="name != null and name != ''">name,</if>
+            <if test="regionId != null">region_id,</if>
+            <if test="regionName != null">region_name,</if>
+            <if test="entranceId != null">entrance_id,</if>
+            <if test="entranceName != null">entrance_name,</if>
+            <if test="domainType != null">domain_type,</if>
+            <if test="domainText != null">domain_text,</if>
+            <if test="description != null">description,</if>
+            <if test="recommendedLevel != null">recommended_level,</if>
+            <if test="recommendedElements != null">recommended_elements,</if>
+            <if test="unlockRank != null">unlock_rank,</if>
+            <if test="daysOfWeek != null">days_of_week,</if>
+            <if test="disorder != null">disorder,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="regionId != null">#{regionId},</if>
+            <if test="regionName != null">#{regionName},</if>
+            <if test="entranceId != null">#{entranceId},</if>
+            <if test="entranceName != null">#{entranceName},</if>
+            <if test="domainType != null">#{domainType},</if>
+            <if test="domainText != null">#{domainText},</if>
+            <if test="description != null">#{description},</if>
+            <if test="recommendedLevel != null">#{recommendedLevel},</if>
+            <if test="recommendedElements != null">#{recommendedElements},</if>
+            <if test="unlockRank != null">#{unlockRank},</if>
+            <if test="daysOfWeek != null">#{daysOfWeek},</if>
+            <if test="disorder != null">#{disorder},</if>
+         </trim>
+    </insert>
+
+    <update id="updateGenshinDomain" parameterType="GenshinDomain">
+        update genshin_domain
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="regionId != null">region_id = #{regionId},</if>
+            <if test="regionName != null">region_name = #{regionName},</if>
+            <if test="entranceId != null">entrance_id = #{entranceId},</if>
+            <if test="entranceName != null">entrance_name = #{entranceName},</if>
+            <if test="domainType != null">domain_type = #{domainType},</if>
+            <if test="domainText != null">domain_text = #{domainText},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="recommendedLevel != null">recommended_level = #{recommendedLevel},</if>
+            <if test="recommendedElements != null">recommended_elements = #{recommendedElements},</if>
+            <if test="unlockRank != null">unlock_rank = #{unlockRank},</if>
+            <if test="daysOfWeek != null">days_of_week = #{daysOfWeek},</if>
+            <if test="disorder != null">disorder = #{disorder},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteGenshinDomainById" parameterType="Long">
+        delete from genshin_domain where id = #{id}
+    </delete>
+
+    <delete id="deleteGenshinDomainByIds" parameterType="String">
+        delete from genshin_domain where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.MaterialsMapper">
+    
+    <resultMap type="Materials" id="MaterialsResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="dupealias"    column="dupealias"    />
+        <result property="rarity"    column="rarity"    />
+        <result property="category"    column="category"    />
+        <result property="typeText"    column="type_text"    />
+        <result property="dropDomainId"    column="drop_domain_id"    />
+        <result property="dropDomainName"    column="drop_domain_name"    />
+        <result property="daysOfWeek"    column="days_of_week"    />
+        <result property="sources"    column="sources"    />
+    </resultMap>
+
+    <sql id="selectMaterialsVo">
+        select id, name, dupealias, rarity, category, type_text, drop_domain_id, drop_domain_name, days_of_week, sources from materials
+    </sql>
+
+    <select id="selectMaterialsList" parameterType="Materials" resultMap="MaterialsResult">
+        <include refid="selectMaterialsVo"/>
+        <where>  
+            <if test="name != null and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="category != null and category != ''"> and category = #{category}</if>
+            <if test="typeText != null and typeText != ''"> and type_text = #{typeText}</if>
+        </where>
+    </select>
+    
+    <select id="selectMaterialsById" parameterType="Long" resultMap="MaterialsResult">
+        <include refid="selectMaterialsVo"/>
+        where id = #{id}
+    </select>
+    
+    <select id="selectMaterialsByName" parameterType="String" resultMap="MaterialsResult">
+        <include refid="selectMaterialsVo"/>
+        where name = #{name}
+        limit 1
+    </select>
+
+</mapper>

@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('养成计算器')" />
+    <th:block th:include="include :: select2-css" />
+    <style>
+        .section-title { border-bottom: 2px solid #3c8dbc; padding-bottom: 5px; margin-bottom: 8px; font-size: 15px; font-weight: 700; }
+        .calc-section { margin-bottom: 5px; }
+        .calc-section .box { margin-bottom: 5px; }
+        .calc-section .box-body { padding: 8px 15px; }
+        .char-summary { font-size: 14px; padding: 6px 0; }
+        .char-summary strong { margin-right: 12px; }
+        #resultArea { display: none; }
+        .loading-overlay { text-align: center; padding: 40px; }
+        
+        /* 摩拉展示 */
+        .mora-box { background: #fff3cd; border: 1px solid #ffc107; border-radius: 4px; padding: 12px 18px; margin-bottom: 8px; font-size: 15px; }
+        
+        /* 来源分类标签 */
+        .source-badge { display: inline-block; padding: 3px 10px; border-radius: 10px; font-size: 12px; font-weight: 700; color: #fff; margin-right: 5px; }
+        .source-gather { background-color: #5cb85c; }
+        .source-boss { background-color: #d9534f; }
+        .source-domain { background-color: #5bc0de; }
+        .source-domain_talent { background-color: #5bc0de; }
+        .source-domain_weapon { background-color: #428bca; }
+        .source-craft_only { background-color: #f0ad4e; }
+        .source-event { background-color: #9b59b6; }
+        .source-shop { background-color: #e67e22; }
+        .source-unknown { background-color: #95a5a6; }
+        
+        /* 合成路线 */
+        .craft-route { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 6px 10px; margin-top: 4px; font-size: 12px; }
+        .craft-arrow { color: #e74c3c; font-weight: 700; margin: 0 5px; }
+        .craft-mora { color: #b8860b; }
+        
+        /* 来源分组区域 */
+        .source-group { margin-bottom: 8px; }
+        .source-group-header { padding: 6px 12px; border-radius: 4px 4px 0 0; font-size: 14px; font-weight: 700; color: #fff; }
+        .source-group-body { border: 1px solid #ddd; border-top: none; padding: 8px; }
+        
+        .material-row { display: flex; align-items: center; padding: 6px 0; border-bottom: 1px dashed #eee; }
+        .material-row:last-child { border-bottom: none; }
+        .material-name { flex: 0 0 180px; font-weight: 700; }
+        .material-count { flex: 0 0 80px; text-align: center; }
+        .material-count .count-label { background: #e74c3c; color: #fff; padding: 2px 10px; border-radius: 10px; font-size: 14px; font-weight: 700; }
+        .material-domain { flex: 0 0 200px; font-size: 12px; color: #666; }
+        .material-craft { flex: 1; }
+        
+        .no-materials { text-align: center; padding: 20px; color: #999; }
+        .empty-state { text-align: center; padding: 60px 20px; color: #999; }
+        .empty-state i { font-size: 48px; margin-bottom: 10px; }
+    </style>
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content" style="padding-top: 5px;">
+
+        <!-- ==================== 查询条件 ==================== -->
+        <div class="row calc-section">
+            <div class="col-sm-12">
+                <div class="box box-solid">
+                    <div class="box-header with-border">
+                        <h3 class="box-title section-title">
+                            <i class="fa fa-calculator"></i> 养成计算器
+                        </h3>
+                    </div>
+                    <div class="box-body">
+                        <form id="calcForm" class="form-inline">
+                            <div class="form-group" style="margin-right: 15px; margin-bottom: 5px;">
+                                <label class="control-label" style="margin-right: 6px;">选择角色</label>
+                                <select id="characterId" name="characterId" class="form-control" style="width: 220px;">
+                                    <option value="">-- 请选择角色 --</option>
+                                    <option th:each="c : ${characters}" th:value="${c.id}"
+                                            th:text="${c.name + ' (' + c.elementText + ')'}"></option>
+                                </select>
+                            </div>
+                            <div style="display:inline-block; margin-left:5px;">
+                                <span style="color:#999; font-size:12px; margin-right:10px;">
+                                    <i class="fa fa-info-circle"></i> 将自动计算：角色突破0→90 + 天赋1→10
+                                </span>
+                                <button type="button" id="btnCalc" class="btn btn-primary" onclick="doCalculate()">
+                                    <i class="fa fa-calculator"></i> 开始计算
+                                </button>
+                                <button type="button" class="btn btn-default" onclick="resetForm()" style="margin-left:5px;">
+                                    <i class="fa fa-refresh"></i> 重置
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== 加载动画 ==================== -->
+        <div id="loadingArea" class="loading-overlay" style="display:none;">
+            <i class="fa fa-spinner fa-pulse fa-3x" style="color:#3c8dbc;"></i>
+            <p style="margin-top:10px; color:#666;">正在全方位计算养成材料，请稍候...</p>
+        </div>
+
+        <!-- ==================== 计算结果 ==================== -->
+        <div id="resultArea">
+
+            <!-- 角色概要 -->
+            <div class="row calc-section">
+                <div class="col-sm-12">
+                    <div class="box box-solid">
+                        <div class="box-header with-border">
+                            <h3 class="box-title section-title">
+                                <i class="fa fa-user"></i> 角色概要
+                            </h3>
+                        </div>
+                        <div class="box-body char-summary" id="charSummary"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 摩拉总消耗 -->
+            <div class="row calc-section">
+                <div class="col-sm-12">
+                    <div class="mora-box" id="moraSummary" style="display:none;">
+                        <i class="fa fa-money fa-lg" style="color:#b8860b;"></i>
+                        <strong>摩拉总消耗：</strong>
+                        <span id="moraTotal" style="font-weight:700; color:#856404;"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 材料列表（按来源分组） -->
+            <div class="row calc-section">
+                <div class="col-sm-12">
+                    <div class="box box-solid">
+                        <div class="box-header with-border">
+                            <h3 class="box-title section-title">
+                                <i class="fa fa-list"></i> 所需材料
+                                <small id="materialCountHint" style="margin-left:10px;"></small>
+                            </h3>
+                        </div>
+                        <div class="box-body" id="materialGroupContainer"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 合成路线汇总 -->
+            <div class="row calc-section" id="craftSection" style="display:none;">
+                <div class="col-sm-12">
+                    <div class="box box-solid">
+                        <div class="box-header with-border">
+                            <h3 class="box-title section-title">
+                                <i class="fa fa-flask"></i> 材料合成路线
+                                <small>低阶 → 高阶 (3:1合成)</small>
+                            </h3>
+                        </div>
+                        <div class="box-body" id="craftRouteContainer"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: select2-js" />
+
+    <script>
+        $(function() {
+            $('#characterId').select2();
+        });
+
+        function resetForm() {
+            $('#characterId').val('');
+            $('#resultArea').hide();
+            $('#moraSummary').hide();
+        }
+
+        function doCalculate() {
+            var characterId = $('#characterId').val();
+            if (!characterId) {
+                $.modal.alertWarning('请先选择一个角色');
+                return;
+            }
+
+            $('#resultArea').hide();
+            $('#loadingArea').show();
+            $('#btnCalc').attr('disabled', true).html('<i class="fa fa-spinner fa-pulse"></i> 计算中...');
+
+            $.ajax({
+                url: ctx + 'system/calculator/calculateAll',
+                type: 'POST',
+                data: { characterId: characterId },
+                success: function(result) {
+                    if (result.code === 0) {
+                        renderResult(result.data);
+                    } else {
+                        $.modal.alertWarning(result.msg || '计算失败');
+                    }
+                },
+                error: function() {
+                    $.modal.alertError('请求失败，请检查网络连接');
+                },
+                complete: function() {
+                    $('#loadingArea').hide();
+                    $('#btnCalc').attr('disabled', false).html('<i class="fa fa-calculator"></i> 开始计算');
+                }
+            });
+        }
+
+        function renderResult(data) {
+            if (!data || !data.character) {
+                $.modal.alertWarning('未获取到角色信息');
+                return;
+            }
+
+            var c = data.character;
+
+            // ===== 角色概要 =====
+            var charHtml = '';
+            charHtml += '<strong>角色：</strong><span>' + (c.name || '') + '</span>';
+            if (c.title) { charHtml += '<strong>称号：</strong><span>' + c.title + '</span>'; }
+            if (c.elementText) { charHtml += '<strong>元素：</strong><span>' + c.elementText + '</span>'; }
+            if (c.weaponText) { charHtml += '<strong>武器：</strong><span>' + c.weaponText + '</span>'; }
+            if (c.rarity) {
+                var stars = '';
+                for (var i = 0; i < c.rarity; i++) { stars += '★'; }
+                charHtml += '<strong>星级：</strong><span style="color:' + (c.rarity == 5 ? '#f5a623' : '#a335ee') + ';">' + stars + '</span>';
+            }
+            if (c.constellation) { charHtml += '<strong>命之座：</strong><span>' + c.constellation + '</span>'; }
+            charHtml += '<strong>计算范围：</strong><span class="label label-primary">突破 0→90</span> <span class="label label-success">天赋 1→10</span>';
+            $('#charSummary').html(charHtml);
+
+            // ===== 摩拉总消耗 =====
+            var totalMora = (data.totalMora || 0);
+            if (totalMora > 0) {
+                var moraHtml = '';
+                if (data.talentMora > 0) {
+                    moraHtml += '天赋摩拉：<strong>' + formatNumber(data.talentMora) + '</strong> &nbsp;|&nbsp; ';
+                }
+                if (data.ascensionMora > 0) {
+                    moraHtml += '突破摩拉：<strong>' + formatNumber(data.ascensionMora) + '</strong> &nbsp;|&nbsp; ';
+                }
+                moraHtml += '合计：<span style="font-size:18px;">' + formatNumber(totalMora) + '</span>';
+                $('#moraTotal').html(moraHtml);
+                $('#moraSummary').show();
+            } else {
+                $('#moraSummary').hide();
+            }
+
+            // ===== 按来源分组展示材料 =====
+            var materials = data.materials || [];
+            $('#materialCountHint').text('共 ' + materials.length + ' 种材料');
+
+            if (materials.length === 0) {
+                $('#materialGroupContainer').html(
+                    '<div class="empty-state"><i class="fa fa-inbox"></i><p>该角色无需消耗额外材料</p></div>'
+                );
+            } else {
+                // 定义来源类型的显示顺序和信息
+                var sourceConfig = {
+                    'gather':       { label: '大世界采集',       color: '#5cb85c', icon: 'fa-leaf' },
+                    'boss':         { label: 'BOSS掉落',         color: '#d9534f', icon: 'fa-shield' },
+                    'domain_talent':{ label: '秘境·天赋培养',    color: '#5bc0de', icon: 'fa-book' },
+                    'domain_weapon':{ label: '秘境·武器突破',    color: '#428bca', icon: 'fa-crosshairs' },
+                    'domain':       { label: '秘境',             color: '#5bc0de', icon: 'fa-building' },
+                    'craft_only':   { label: '合成获得',         color: '#f0ad4e', icon: 'fa-flask' },
+                    'event':        { label: '活动奖励',         color: '#9b59b6', icon: 'fa-gift' },
+                    'shop':         { label: '商城兑换',         color: '#e67e22', icon: 'fa-shopping-cart' },
+                    'unknown':      { label: '其他',             color: '#95a5a6', icon: 'fa-question-circle' }
+                };
+
+                // 按来源分组
+                var groups = {};
+                $.each(materials, function(idx, item) {
+                    var st = item.sourceType || 'unknown';
+                    if (!groups[st]) groups[st] = [];
+                    groups[st].push(item);
+                });
+
+                var order = ['gather', 'boss', 'domain_talent', 'domain_weapon', 'domain', 'craft_only', 'event', 'shop', 'unknown'];
+                var html = '';
+                $.each(order, function(oi, st) {
+                    if (!groups[st]) return;
+                    var cfg = sourceConfig[st] || { label: '其他', color: '#95a5a6', icon: 'fa-question-circle' };
+                    html += '<div class="source-group">';
+                    html += '<div class="source-group-header" style="background:' + cfg.color + ';">';
+                    html += '<i class="fa ' + cfg.icon + '"></i> ' + cfg.label;
+                    html += ' <span style="font-size:12px; opacity:0.8;">(' + groups[st].length + ' 种)</span>';
+                    html += '</div>';
+                    html += '<div class="source-group-body">';
+
+                    $.each(groups[st], function(ii, item) {
+                        var craftHtml = '';
+                        var routes = item.craftRoutes || [];
+                        if (routes.length > 0) {
+                            $.each(routes, function(ri, route) {
+                                var ingredients = route.ingredients || [];
+                                var ingTexts = [];
+                                $.each(ingredients, function(gi, ing) {
+                                    ingTexts.push(ing.materialCount + '× ' + ing.materialName);
+                                });
+                                var moraCost = route.moraCost || 0;
+                                craftHtml += '<div class="craft-route">';
+                                craftHtml += '<i class="fa fa-long-arrow-right craft-arrow"></i> 合成路线：';
+                                craftHtml += ingTexts.join(' + ');
+                                if (moraCost > 0) {
+                                    craftHtml += ' + <span class="craft-mora"><i class="fa fa-money"></i> ' + formatNumber(moraCost) + '</span>';
+                                }
+                                craftHtml += ' → <strong>' + (route.resultName || '') + '</strong>';
+                                craftHtml += '</div>';
+                            });
+                        }
+
+                        // 秘境信息
+                        var domainHtml = '';
+                        if (item.dropDomainName) {
+                            domainHtml += '<span style="color:#5bc0de;">';
+                            domainHtml += '<i class="fa fa-building"></i> ' + item.dropDomainName;
+                            if (item.daysOfWeek) {
+                                try {
+                                    var days = JSON.parse(item.daysOfWeek);
+                                    if (Array.isArray(days) && days.length > 0) {
+                                        domainHtml += ' (' + days.join('、') + ')';
+                                    }
+                                } catch(e) {}
+                            }
+                            domainHtml += '</span>';
+                        }
+
+                        html += '<div class="material-row">';
+                        html += '<div class="material-name">' + (item.materialName || '未知');
+                        if (item.rarity) {
+                            var stars = '';
+                            for (var s = 0; s < item.rarity; s++) stars += '★';
+                            html += ' <span style="color:#f5a623; font-size:11px;">' + stars + '</span>';
+                        }
+                        html += '</div>';
+                        html += '<div class="material-count"><span class="count-label">' + formatNumber(item.totalCount || 0) + '</span></div>';
+                        html += '<div class="material-domain">' + domainHtml + '</div>';
+                        html += '<div class="material-craft">' + craftHtml + '</div>';
+                        html += '</div>';
+                    });
+
+                    html += '</div></div>';
+                });
+
+                $('#materialGroupContainer').html(html);
+            }
+
+            // ===== 合成路线汇总 =====
+            var allRoutes = [];
+            $.each(materials, function(idx, item) {
+                var routes = item.craftRoutes || [];
+                if (routes.length > 0) {
+                    $.each(routes, function(ri, route) {
+                        allRoutes.push({
+                            materialName: item.materialName,
+                            totalCount: item.totalCount,
+                            route: route
+                        });
+                    });
+                }
+            });
+
+            if (allRoutes.length > 0) {
+                $('#craftSection').show();
+                var craftHtml = '<table class="table table-bordered table-striped"><thead><tr>';
+                craftHtml += '<th width="5%">#</th>';
+                craftHtml += '<th width="20%">目标材料</th>';
+                craftHtml += '<th width="12%">所需数量</th>';
+                craftHtml += '<th>合成配方</th>';
+                craftHtml += '<th width="12%">摩拉消耗</th>';
+                craftHtml += '<th width="10%">解锁等级</th>';
+                craftHtml += '</tr></thead><tbody>';
+
+                $.each(allRoutes, function(idx, item) {
+                    var route = item.route;
+                    var ingredients = route.ingredients || [];
+                    var ingTexts = [];
+                    $.each(ingredients, function(gi, ing) {
+                        ingTexts.push('<strong>' + ing.materialCount + '</strong>× ' + ing.materialName);
+                    });
+
+                    craftHtml += '<tr>';
+                    craftHtml += '<td>' + (idx + 1) + '</td>';
+                    craftHtml += '<td><strong>' + (item.materialName || '') + '</strong></td>';
+                    craftHtml += '<td><span class="label label-danger">' + formatNumber(item.totalCount || 0) + '</span></td>';
+                    craftHtml += '<td><span style="color:#e74c3c;">' + ingTexts.join(' + ') + '</span> → ' + (route.resultName || '') + '</td>';
+                    craftHtml += '<td><span class="craft-mora"><i class="fa fa-money"></i> ' + formatNumber(route.moraCost || 0) + '</span></td>';
+                    craftHtml += '<td>' + (route.unlockRank || 1) + '</td>';
+                    craftHtml += '</tr>';
+                });
+
+                craftHtml += '</tbody></table>';
+                $('#craftRouteContainer').html(craftHtml);
+            } else {
+                $('#craftSection').hide();
+            }
+
+            $('#resultArea').show();
+        }
+
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+    </script>
+</body>
+</html>

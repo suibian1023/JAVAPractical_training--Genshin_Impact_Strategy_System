@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.GenshinWeaponMapper">
+    
+    <resultMap type="GenshinWeapon" id="GenshinWeaponResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="description"    column="description"    />
+        <result property="weaponType"    column="weapon_type"    />
+        <result property="weaponText"    column="weapon_text"    />
+        <result property="rarity"    column="rarity"    />
+        <result property="baseAtkValue"    column="base_atk_value"    />
+        <result property="mainStatType"    column="main_stat_type"    />
+        <result property="mainStatText"    column="main_stat_text"    />
+        <result property="baseStatText"    column="base_stat_text"    />
+        <result property="effectName"    column="effect_name"    />
+        <result property="r1Description"    column="r1_description"    />
+        <result property="r2Description"    column="r2_description"    />
+        <result property="r3Description"    column="r3_description"    />
+        <result property="r4Description"    column="r4_description"    />
+        <result property="r5Description"    column="r5_description"    />
+        <result property="costsJson"    column="costs_json"    />
+        <result property="story"    column="story"    />
+        <result property="createdAt"    column="created_at"    />
+        <result property="updatedAt"    column="updated_at"    />
+    </resultMap>
+
+    <sql id="selectGenshinWeaponVo">
+        select id, name, description, weapon_type, weapon_text, rarity, base_atk_value, main_stat_type, main_stat_text, base_stat_text, effect_name, r1_description, r2_description, r3_description, r4_description, r5_description, costs_json, story, created_at, updated_at from weapons
+    </sql>
+
+    <select id="selectGenshinWeaponList" parameterType="GenshinWeapon" resultMap="GenshinWeaponResult">
+        <include refid="selectGenshinWeaponVo"/>
+        <where>  
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="weaponType != null  and weaponType != ''"> and weapon_type = #{weaponType}</if>
+            <if test="weaponText != null  and weaponText != ''"> and weapon_text = #{weaponText}</if>
+            <if test="rarity != null "> and rarity = #{rarity}</if>
+            <if test="mainStatText != null  and mainStatText != ''"> and main_stat_text = #{mainStatText}</if>
+            <if test="effectName != null  and effectName != ''"> and effect_name like concat('%', #{effectName}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectGenshinWeaponById" parameterType="Long" resultMap="GenshinWeaponResult">
+        <include refid="selectGenshinWeaponVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertGenshinWeapon" parameterType="GenshinWeapon">
+        insert into weapons
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="name != null and name != ''">name,</if>
+            <if test="description != null">description,</if>
+            <if test="weaponType != null and weaponType != ''">weapon_type,</if>
+            <if test="weaponText != null and weaponText != ''">weapon_text,</if>
+            <if test="rarity != null">rarity,</if>
+            <if test="baseAtkValue != null">base_atk_value,</if>
+            <if test="mainStatType != null">main_stat_type,</if>
+            <if test="mainStatText != null">main_stat_text,</if>
+            <if test="baseStatText != null">base_stat_text,</if>
+            <if test="effectName != null">effect_name,</if>
+            <if test="r1Description != null">r1_description,</if>
+            <if test="r2Description != null">r2_description,</if>
+            <if test="r3Description != null">r3_description,</if>
+            <if test="r4Description != null">r4_description,</if>
+            <if test="r5Description != null">r5_description,</if>
+            <if test="costsJson != null">costs_json,</if>
+            <if test="story != null">story,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="description != null">#{description},</if>
+            <if test="weaponType != null and weaponType != ''">#{weaponType},</if>
+            <if test="weaponText != null and weaponText != ''">#{weaponText},</if>
+            <if test="rarity != null">#{rarity},</if>
+            <if test="baseAtkValue != null">#{baseAtkValue},</if>
+            <if test="mainStatType != null">#{mainStatType},</if>
+            <if test="mainStatText != null">#{mainStatText},</if>
+            <if test="baseStatText != null">#{baseStatText},</if>
+            <if test="effectName != null">#{effectName},</if>
+            <if test="r1Description != null">#{r1Description},</if>
+            <if test="r2Description != null">#{r2Description},</if>
+            <if test="r3Description != null">#{r3Description},</if>
+            <if test="r4Description != null">#{r4Description},</if>
+            <if test="r5Description != null">#{r5Description},</if>
+            <if test="costsJson != null">#{costsJson},</if>
+            <if test="story != null">#{story},</if>
+         </trim>
+    </insert>
+
+    <update id="updateGenshinWeapon" parameterType="GenshinWeapon">
+        update weapons
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="weaponType != null and weaponType != ''">weapon_type = #{weaponType},</if>
+            <if test="weaponText != null and weaponText != ''">weapon_text = #{weaponText},</if>
+            <if test="rarity != null">rarity = #{rarity},</if>
+            <if test="baseAtkValue != null">base_atk_value = #{baseAtkValue},</if>
+            <if test="mainStatType != null">main_stat_type = #{mainStatType},</if>
+            <if test="mainStatText != null">main_stat_text = #{mainStatText},</if>
+            <if test="baseStatText != null">base_stat_text = #{baseStatText},</if>
+            <if test="effectName != null">effect_name = #{effectName},</if>
+            <if test="r1Description != null">r1_description = #{r1Description},</if>
+            <if test="r2Description != null">r2_description = #{r2Description},</if>
+            <if test="r3Description != null">r3_description = #{r3Description},</if>
+            <if test="r4Description != null">r4_description = #{r4Description},</if>
+            <if test="r5Description != null">r5_description = #{r5Description},</if>
+            <if test="costsJson != null">costs_json = #{costsJson},</if>
+            <if test="story != null">story = #{story},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteGenshinWeaponById" parameterType="Long">
+        delete from weapons where id = #{id}
+    </delete>
+
+    <delete id="deleteGenshinWeaponByIds" parameterType="String">
+        delete from weapons where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>
